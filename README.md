@@ -21,10 +21,13 @@ This is a Coin Market Cap Scrape that scrapes the top 100 coins of the following
 
 **Scrapes the information listed above and put it in an csv file**
 
+* Will add feature for sql inject
 
-## To Run:
-
+## Requirements:
 * ```pip install requirements.txt```
+* Request for a API Key from [here](https://coinmarketcap.com/api/) and put the key in a '.env' file with the name API_KEY='YOURKEYHERE'
+
+## To run:
 
 * ```python coinscraper.py```
 
@@ -46,10 +49,8 @@ This is a Coin Market Cap Scrape that scrapes the top 100 coins of the following
 
 * decouple
 
-
+* sqlite
 
 ## Author:
 
-[Qi](https://github.com/swordwielder/discordStockBot/graphs/contributors)
-
-[LinkedIn](https://www.linkedin.com/in/qifchen/)
+[Qi](https://github.com/swordwielder/discordStockBot/graphs/contributors) - [LinkedIn](https://www.linkedin.com/in/qifchen/)
