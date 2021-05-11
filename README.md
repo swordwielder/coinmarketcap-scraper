@@ -25,7 +25,8 @@ This is a Coin Market Cap Scrape that scrapes the top 100 coins of the following
 
 ## Requirements:
 * ```pip install requirements.txt```
-* Request for a API Key from [here](https://coinmarketcap.com/api/) and put the key in a '.env' file with the name API_KEY='YOURKEYHERE'
+
+* Request for a API Key from [here](https://coinmarketcap.com/api/) and put the key in a `.env` file with the name API_KEY='YOURKEYHERE'
 
 ## To run:
 
