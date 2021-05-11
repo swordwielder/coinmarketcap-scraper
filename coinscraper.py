@@ -5,7 +5,8 @@ from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
 from decouple import config
 import csv
-
+import sqlite3
+from sqlite3 import Error
 
 
 #initialize function
@@ -31,11 +32,15 @@ def initialize():
     session.headers.update(headers)
 
     try:
+        #get response from the url
         response = session.get(url, params=parameters)
+        #loads it in json for all the text found from response
         data = json.loads(response.text)
-        
+        #set all coins to the data 
         coins = data['data']
+        #for each coin in all the coins found
         for coin in coins:
+            #append each coin to the list
             newdata=[]
             newdata.append(coin['name'])
             newdata.append(coin['symbol'])
@@ -66,6 +71,19 @@ def write_to_csv(file):
 
 
 
+def connect_db():
+    conn = sqlite3.connect('TestDB.db')  # You can create a new database by changing the name within the quotes
+    c = conn.cursor() # The database will be saved in the location where your 'py' file is saved
+    c.execute('''CREATE TABLE  IF NOT EXISTS CRYPTOCURRENCIES
+             (Name TEXT, Symbol TEXT PRIMARY KEY)''')
+
+    c.execute('''CREATE TABLE  IF NOT EXISTS MARKETDATA
+             (PULLTIME DATETIME, Symbol TEXT, PER_CHANGE_H TEXT, PER_CHANGE_D TEXT, 
+             MARKET_CAP TEXT, VOL_H TEXT, CIRCULATING_SUPPLY TEXT, FOREIGN KEY (Symbol) REFERENCES CRYPTOCURRENCIES(Symbol) ) ''')
+          
+    
+
+connect_db()
 
 
 file = initialize()
