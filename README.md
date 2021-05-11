@@ -19,7 +19,7 @@ This is a Coin Market Cap Scrape that scrapes the top 100 coins of the following
 
 ## What it does
 
-`Scrapes the information listed above and put it in an csv file`
+**Scrapes the information listed above and put it in an csv file**
 
 
 ## To Run:
@@ -48,7 +48,7 @@ This is a Coin Market Cap Scrape that scrapes the top 100 coins of the following
 
 
 
-## Authors:
+## Author:
 
 [Qi](https://github.com/swordwielder/discordStockBot/graphs/contributors)
 
