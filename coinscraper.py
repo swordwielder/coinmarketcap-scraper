@@ -4,50 +4,70 @@ from requests import Request, Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
 from decouple import config
+import csv
 
 
-API_KEY = config('API_KEY')
+
+#initialize function
+def initialize():
+    alldata = []
+    #gets API key from environment variable
+    API_KEY = config('API_KEY')
+
+    # sets url and parameters and takes API key for header
+    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
+    parameters = {
+    'start':'1',
+    'limit':'100',
+    'convert':'USD'
+    }
+    headers = {
+    'Accepts': 'application/json',
+    'X-CMC_PRO_API_KEY': API_KEY,
+    }
+
+    #initialize a session and update header for session
+    session = Session()
+    session.headers.update(headers)
+
+    try:
+        response = session.get(url, params=parameters)
+        data = json.loads(response.text)
+        
+        coins = data['data']
+        for coin in coins:
+            newdata=[]
+            newdata.append(coin['name'])
+            newdata.append(coin['symbol'])
+            newdata.append(str(coin['quote']['USD']['percent_change_24h']))
+            newdata.append(coin['quote']['USD']['percent_change_7d'])
+            newdata.append(coin['quote']['USD']['market_cap'])
+            newdata.append(coin['quote']['USD']['volume_24h'])
+            newdata.append(coin['circulating_supply'])
+            alldata.append(newdata)
+        
+
+    #   print(data)
+    except (ConnectionError, Timeout, TooManyRedirects) as e:
+        print(e)
+
+    return alldata
+
+#Writing to CSV file from the data gathered
+def write_to_csv(file):
+
+    fields = ['Name', 'Symbol', 'Percent Change', 'Percent Change 7 days', 'Market Cap', 'Volume 24 Hr', 'Circulating Supply']
+    filename = 'coinmarketcap.csv'
+
+    with open(filename, 'w') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(fields)
+        csvwriter.writerows(file)
 
 
-url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
-parameters = {
-  'start':'1',
-  'limit':'3',
-  'convert':'USD'
-}
-headers = {
-  'Accepts': 'application/json',
-  'X-CMC_PRO_API_KEY': API_KEY,
-}
-
-session = Session()
-session.headers.update(headers)
-
-try:
-    response = session.get(url, params=parameters)
-    data = json.loads(response.text)
-    print('Actual Data')
-    # print(data)
-    print(data['data'])
-    coins = data['data']
-    for coin in coins:
-        print('Name: '+coin['name'])
-        print('Symbol: ' + coin['symbol'])
-        print('Percent Change: ' + str(coin['quote']['USD']['percent_change_24h']))
-        print('Percent change 7 days: '+ str(coin['quote']['USD']['percent_change_7d']))
-        print('Market cap: ' + str(coin['quote']['USD']['market_cap']))
-        print('Volume 24 hours: '+ str(coin['quote']['USD']['volume_24h']))
-        print('Circulating Supply: '+ str(coin['circulating_supply']))
-        print()
-    # coin_json = json.dumps(data, indent=4, sort_keys=True)
-    # print(coin_json)
-    # print('For each item')
-    # for i in coin_json:
-    #     print(i['data'])
-
-#   print(data)
-except (ConnectionError, Timeout, TooManyRedirects) as e:
-    print(e)
 
 
+
+file = initialize()
+write_to_csv(file)
 
