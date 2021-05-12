@@ -1,7 +1,7 @@
 # Coin Market Cap Scraper
 
 ## INTRODUCTION
-This is a Coin Market Cap Scrape that scrapes the top 100 coins of the following information
+This is a Coin Market Cap Scraper that scrapes the top 100 coins of the following information
 
 * CryptoCurrency name
 
@@ -26,7 +26,9 @@ This is a Coin Market Cap Scrape that scrapes the top 100 coins of the following
 ## Requirements:
 * ```pip install requirements.txt```
 
-* Request for a API Key from [here](https://coinmarketcap.com/api/) and put the key in a `.env` file with the name API_KEY='YOURKEYHERE'
+* Request for a API Key from [here](https://coinmarketcap.com/api/) and put the key in a `.env` file with the name API_KEY='YOURKEYHERE' in the same directory
+
+* [SQLite Studio](https://sqlitestudio.pl/) **optional** can be used to view the data from the database 
 
 ## To run:
 

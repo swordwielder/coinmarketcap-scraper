@@ -7,9 +7,17 @@ from decouple import config
 import csv
 import sqlite3
 from sqlite3 import Error
+from datetime import datetime
+# import TestDB.db
 
+# mydb = mysql.connector.connect(
+#   host="localhost",
+#   user="yourusername",
+#   password="yourpassword"
+# )
 
 #initialize function
+
 def initialize():
     alldata = []
     #gets API key from environment variable
@@ -49,10 +57,21 @@ def initialize():
             newdata.append(coin['quote']['USD']['market_cap'])
             newdata.append(coin['quote']['USD']['volume_24h'])
             newdata.append(coin['circulating_supply'])
-            alldata.append(newdata)
-        
 
-    #   print(data)
+            # datetime object containing current date and time
+            now = datetime.now()
+            # print("now =", now)
+            # dd/mm/YY H:M:S
+            dt_string = now.strftime("%Y-%m-%d %H:%M:%S")
+            # print("date and time =", dt_string)
+            newdata.append(dt_string)
+
+
+            alldata.append(newdata)
+
+            
+
+
     except (ConnectionError, Timeout, TooManyRedirects) as e:
         print(e)
 
@@ -61,7 +80,7 @@ def initialize():
 #Writing to CSV file from the data gathered
 def write_to_csv(file):
 
-    fields = ['Name', 'Symbol', 'Percent Change', 'Percent Change 7 days', 'Market Cap', 'Volume 24 Hr', 'Circulating Supply']
+    fields = ['Name', 'Symbol', 'Percent Change', 'Percent Change 7 days', 'Market Cap', 'Volume 24 Hr', 'Circulating Supply', 'Time']
     filename = 'coinmarketcap.csv'
 
     with open(filename, 'w') as csvfile:
@@ -71,21 +90,44 @@ def write_to_csv(file):
 
 
 
-def connect_db():
-    conn = sqlite3.connect('TestDB.db')  # You can create a new database by changing the name within the quotes
-    c = conn.cursor() # The database will be saved in the location where your 'py' file is saved
-    c.execute('''CREATE TABLE  IF NOT EXISTS CRYPTOCURRENCIES
-             (Name TEXT, Symbol TEXT PRIMARY KEY)''')
+def connect_db(alldata):
+    try:
+        conn = sqlite3.connect('crypto.db')  # You can create a new database by changing the name within the quotes
+        c = conn.cursor() # The database will be saved in the location where your 'py' file is saved
+        c.execute('''CREATE TABLE  IF NOT EXISTS CRYPTOCURRENCIES
+                (Name TEXT PRIMARY KEY, Symbol TEXT)''')
 
-    c.execute('''CREATE TABLE  IF NOT EXISTS MARKETDATA
-             (PULLTIME DATETIME, Symbol TEXT, PER_CHANGE_H TEXT, PER_CHANGE_D TEXT, 
-             MARKET_CAP TEXT, VOL_H TEXT, CIRCULATING_SUPPLY TEXT, FOREIGN KEY (Symbol) REFERENCES CRYPTOCURRENCIES(Symbol) ) ''')
-          
+        c.execute('''CREATE TABLE  IF NOT EXISTS MARKETDATA
+                (PULLTIME DATETIME, Name TEXT, PER_CHANGE_H TEXT, PER_CHANGE_D TEXT, 
+                MARKET_CAP TEXT, VOL_H TEXT, CIRCULATING_SUPPLY TEXT, FOREIGN KEY (Name) REFERENCES CRYPTOCURRENCIES(Symbol) ) ''')
+
+        crytoNS = []
+        for i in alldata:
+            crytoNS.append(tuple(i[:2]))
+        
+
+        sqlite_insert_query = """INSERT INTO CRYPTOCURRENCIES (Name, Symbol) VALUES (?, ?) """
+        c.executemany(sqlite_insert_query, crytoNS)
+        conn.commit()
+        
+        
+        c.execute("SELECT * FROM CRYPTOCURRENCIES")
+        row = c.fetchall()
+        print(row)
+        
+    except Error as e:
+        print(e)
     
+    # return conn
 
-connect_db()
-
-
+# def create_table(conn):
+    
 file = initialize()
-write_to_csv(file)
+# write_to_csv(file)
+
+connect_db(file)
+
+
+
+
 
