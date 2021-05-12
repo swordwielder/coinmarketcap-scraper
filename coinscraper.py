@@ -9,7 +9,24 @@ import sqlite3
 from sqlite3 import Error
 from datetime import datetime
 
+from bs4 import BeautifulSoup
+import selenium
+import json
+from selenium import webdriver
+import warnings
+import selenium as se
+import lxml
+from lxml import html
+import xlwt 
+from xlwt import Workbook 
+import csv
 
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
+from lxml import etree
+
+
+#API call method
 #initialize function
 def initialize():
 
@@ -60,13 +77,41 @@ def initialize():
 
             #append the single coin
             alldata.append(newdata)
-            
-
-
     except (ConnectionError, Timeout, TooManyRedirects) as e:
         print(e)
 
     return alldata
+
+
+
+
+
+#BeautifulSoup Scraping method
+def scrape():
+    r = requests.get('https://coinmarketcap.com/')
+    # print(r.content)
+    soup = BeautifulSoup(r.content, "lxml")
+    
+    alldata = []
+    coins = soup.find_all('tr')
+    for coin in range(1,len(coins)):
+        temp = coins[coin].findAll(text=True)
+        print(temp)
+        newdata = []
+        newdata.append(temp[1])
+        newdata.append(temp[3])
+        alldata.append(newdata)
+        print()
+        if coin==25:
+            break
+
+
+    return alldata
+            
+
+
+
+
 
 #Writing to CSV file from the data gathered
 def write_to_csv(file):
@@ -145,12 +190,14 @@ def connect_db(alldata):
     
 
     
+
+
 #Call the 3 functions
-file = initialize()
-write_to_csv(file)
-connect_db(file)
+# file = initialize()
+# write_to_csv(file)
+# connect_db(file)
 
 
-
+print(scrape())
 
 
