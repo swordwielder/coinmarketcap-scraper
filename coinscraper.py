@@ -8,17 +8,11 @@ import csv
 import sqlite3
 from sqlite3 import Error
 from datetime import datetime
-# import TestDB.db
 
-# mydb = mysql.connector.connect(
-#   host="localhost",
-#   user="yourusername",
-#   password="yourpassword"
-# )
 
 #initialize function
-
 def initialize():
+    
     alldata = []
     #gets API key from environment variable
     API_KEY = config('API_KEY')
@@ -91,31 +85,35 @@ def write_to_csv(file):
 
 
 
-
+#Creates the db, create table and insert.
 def connect_db(alldata):
 
     try:
         conn = sqlite3.connect('crypto.db')  # You can create a new database by changing the name within the quotes
         c = conn.cursor() # The database will be saved in the location where your 'py' file is saved
+
+        #create table query and execute
         c.execute('''CREATE TABLE  IF NOT EXISTS CRYPTOCURRENCIES
                 (Name TEXT PRIMARY KEY, Symbol TEXT)''')
 
+        #Create table query and execute
         c.execute('''CREATE TABLE  IF NOT EXISTS MARKETDATA
                 (PULLTIME DATETIME, Name TEXT, PER_CHANGE_H TEXT, PER_CHANGE_D TEXT, 
                 MARKET_CAP TEXT, VOL_H TEXT, CIRCULATING_SUPPLY TEXT, FOREIGN KEY (Name) REFERENCES CRYPTOCURRENCIES(Symbol) ) ''')
 
+        #Crypto Name and Symbol list
         crytoNS = []
         for i in alldata:
             crytoNS.append(tuple(i[:2]))
         
-
+        #Insert that list of tuples into the database and commit
         crypto_insert_query = """INSERT OR REPLACE INTO CRYPTOCURRENCIES (Name, Symbol) VALUES (?, ?) """
         c.executemany(crypto_insert_query, crytoNS)
         conn.commit()
 
-        marketdata = []
-        
-
+        #MarketData List
+        marketdata = []        
+        #Add data for each row to append to a tuple
         for i in alldata:
             market = []
             market.append(i[len(i)-1])
@@ -125,6 +123,7 @@ def connect_db(alldata):
             market.append(i[4])
             market.append(i[5])
             market.append(i[6])
+            #append tuple to list
             marketdata.append(tuple(market))
 
         # print(marketdata)
@@ -146,9 +145,9 @@ def connect_db(alldata):
     
 
     
+#Call the 3 functions
 file = initialize()
 write_to_csv(file)
-
 connect_db(file)
 
 
