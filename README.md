@@ -42,7 +42,7 @@ This is a Coin Market Cap Scraper that scrapes the top 100 coins of the followin
 
 ## Result:
 
-**You should see two files
+**You should see two files**
 
 * coinmarketcap.csv
 
