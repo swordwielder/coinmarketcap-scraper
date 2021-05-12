@@ -48,7 +48,8 @@ def initialize():
         coins = data['data']
         #for each coin in all the coins found
         for coin in coins:
-            #append each coin to the list
+
+            #append each coin data to a list
             newdata=[]
             newdata.append(coin['name'])
             newdata.append(coin['symbol'])
@@ -60,15 +61,11 @@ def initialize():
 
             # datetime object containing current date and time
             now = datetime.now()
-            # print("now =", now)
-            # dd/mm/YY H:M:S
             dt_string = now.strftime("%Y-%m-%d %H:%M:%S")
-            # print("date and time =", dt_string)
             newdata.append(dt_string)
 
-
+            #append the single coin
             alldata.append(newdata)
-
             
 
 
@@ -80,9 +77,13 @@ def initialize():
 #Writing to CSV file from the data gathered
 def write_to_csv(file):
 
-    fields = ['Name', 'Symbol', 'Percent Change', 'Percent Change 7 days', 'Market Cap', 'Volume 24 Hr', 'Circulating Supply', 'Time']
+    fields = ['Name', 'Symbol', 'Percent Change', 'Percent Change 7 days', 'Market Cap', 'Volume 24 Hr', 'Circulating Supply', 'Pull Time']
     filename = 'coinmarketcap.csv'
 
+    #removes the pull time since csv doesn't need that.
+    # newfile = file[:len(file)
+
+    #Writes the info pulled into the CSV
     with open(filename, 'w') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(fields)
@@ -90,7 +91,9 @@ def write_to_csv(file):
 
 
 
+
 def connect_db(alldata):
+
     try:
         conn = sqlite3.connect('crypto.db')  # You can create a new database by changing the name within the quotes
         c = conn.cursor() # The database will be saved in the location where your 'py' file is saved
@@ -106,24 +109,45 @@ def connect_db(alldata):
             crytoNS.append(tuple(i[:2]))
         
 
-        sqlite_insert_query = """INSERT INTO CRYPTOCURRENCIES (Name, Symbol) VALUES (?, ?) """
-        c.executemany(sqlite_insert_query, crytoNS)
+        crypto_insert_query = """INSERT OR REPLACE INTO CRYPTOCURRENCIES (Name, Symbol) VALUES (?, ?) """
+        c.executemany(crypto_insert_query, crytoNS)
         conn.commit()
+
+        marketdata = []
         
+
+        for i in alldata:
+            market = []
+            market.append(i[len(i)-1])
+            market.append(i[0])
+            market.append(i[2])
+            market.append(i[3])
+            market.append(i[4])
+            market.append(i[5])
+            market.append(i[6])
+            marketdata.append(tuple(market))
+
+        # print(marketdata)
+
+        #Insert Data into Market Data table
+        market_insert_query = """INSERT INTO MARKETDATA (PULLTIME , Name , PER_CHANGE_H , PER_CHANGE_D , 
+                MARKET_CAP , VOL_H , CIRCULATING_SUPPLY ) VALUES (?, ?,?,?,?,?,?) """
+        c.executemany(market_insert_query, marketdata)
+        conn.commit()
+
         
-        c.execute("SELECT * FROM CRYPTOCURRENCIES")
+        #List all data from MARKET DATA TABLE
+        c.execute("SELECT * FROM MARKETDATA")
         row = c.fetchall()
         print(row)
         
     except Error as e:
         print(e)
     
-    # return conn
 
-# def create_table(conn):
     
 file = initialize()
-# write_to_csv(file)
+write_to_csv(file)
 
 connect_db(file)
 
