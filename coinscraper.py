@@ -12,7 +12,7 @@ from datetime import datetime
 
 #initialize function
 def initialize():
-    
+
     alldata = []
     #gets API key from environment variable
     API_KEY = config('API_KEY')
@@ -99,7 +99,7 @@ def connect_db(alldata):
         #Create table query and execute
         c.execute('''CREATE TABLE  IF NOT EXISTS MARKETDATA
                 (PULLTIME DATETIME, Name TEXT, PER_CHANGE_H TEXT, PER_CHANGE_D TEXT, 
-                MARKET_CAP TEXT, VOL_H TEXT, CIRCULATING_SUPPLY TEXT, FOREIGN KEY (Name) REFERENCES CRYPTOCURRENCIES(Symbol) ) ''')
+                MARKET_CAP TEXT, VOL_H TEXT, CIRCULATING_SUPPLY TEXT, FOREIGN KEY (Name) REFERENCES CRYPTOCURRENCIES(Name) ) ''')
 
         #Crypto Name and Symbol list
         crytoNS = []
