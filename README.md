@@ -17,22 +17,36 @@ This is a Coin Market Cap Scraper that scrapes the top 100 coins of the followin
 
 * Circulating Supply
 
+
 ## What it does
 
-**Scrapes the information listed above and put it in an csv file**
+**Scrapes the information listed above and put it in an csv file including the scrape time**
 
-* Will add feature for sql inject
+### Additional Feature
+
+* Put all the information gathered into a sqlite database including the scape time
+
 
 ## Requirements:
-* ```pip install requirements.txt```
 
-* Request for a API Key from [here](https://coinmarketcap.com/api/) and put the key in a `.env` file with the name API_KEY='YOURKEYHERE' in the same directory
+* ```pip install -r requirements.txt```
+
+* Request for a API Key from [here](https://coinmarketcap.com/api/) and put the key in a `.env` file with the name API_KEY='YOUR_API_KEY_HERE' (ex: API_KEY=fuywge83hf7832j) in the same directory 
 
 * [SQLite Studio](https://sqlitestudio.pl/) **optional** can be used to view the data from the database 
+
 
 ## To run:
 
 * ```python coinscraper.py```
+
+## Result:
+
+**You should see two files
+
+* coinmarketcap.csv
+
+* crypto.db
 
 
 ## Resources:
@@ -40,8 +54,6 @@ This is a Coin Market Cap Scraper that scrapes the top 100 coins of the followin
 * [coin market cap](https://coinmarketcap.com/) 
 
 * [coin market cap api](https://coinmarketcap.com/api/) (300 per day, 10,000 per month)
-
-
 
 
 ## Library/frameworks:
@@ -53,6 +65,7 @@ This is a Coin Market Cap Scraper that scrapes the top 100 coins of the followin
 * decouple
 
 * sqlite
+
 
 ## Author:
 
