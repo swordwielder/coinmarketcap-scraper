@@ -8,24 +8,25 @@ import csv
 import sqlite3
 from sqlite3 import Error
 from datetime import datetime
-
 from bs4 import BeautifulSoup
-import selenium
 import json
 from selenium import webdriver
-import warnings
 import selenium as se
-import lxml
 from lxml import html
 import xlwt 
 from xlwt import Workbook 
 import csv
-
+import warnings
+import lxml
+from lxml import html
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from lxml import etree
-
-
+import time
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
 #API call method
 #initialize function
 def initialize():
@@ -59,11 +60,12 @@ def initialize():
         coins = data['data']
         #for each coin in all the coins found
         for coin in coins:
-
+            # print(coin)
             #append each coin data to a list
             newdata=[]
             newdata.append(coin['name'])
             newdata.append(coin['symbol'])
+            newdata.append(coin['quote']['USD']['price'])
             newdata.append(str(coin['quote']['USD']['percent_change_24h']))
             newdata.append(coin['quote']['USD']['percent_change_7d'])
             newdata.append(coin['quote']['USD']['market_cap'])
@@ -87,10 +89,63 @@ def initialize():
 
 
 #BeautifulSoup Scraping method
-def scrape():
-    r = requests.get('https://coinmarketcap.com/')
+
+def start_chrome():
+    browser = webdriver.Chrome(ChromeDriverManager().install())
+    # browser = webdriver.Chrome()
+    url = "https://coinmarketcap.com/"
+    browser.get(url) #navigate to the page
+    # time.sleep(1)
+    # browser.execute_script("window.scrollBy(25,document.body.scrollHeight)")
+    # # browser.execute_script("window.scrollTo(0,document.body.scrollHeight)")
+    # time.sleep(1)
+    # browser.execute_script("window.scrollBy(25,document.body.scrollHeight)")
+    # 
+    # browser.execute_script("window.scrollBy(0,document.body.scrollHeight)")
+    browser.maximize_window()
+    # time.sleep(1)
+    wait = WebDriverWait(browser, 10)
+    men_menu = wait.until(ec.visibility_of_element_located((By.XPATH, '//*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[20]')))
+                                          #  //*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[52]
+    ActionChains(browser).move_to_element(men_menu).perform()
+    time.sleep(1)
+    men_menu = wait.until(ec.visibility_of_element_located((By.XPATH, '//*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[40]')))
+    ActionChains(browser).move_to_element(men_menu).perform()
+    time.sleep(1)
+    men_menu = wait.until(ec.visibility_of_element_located((By.XPATH, '//*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[60]')))
+    ActionChains(browser).move_to_element(men_menu).perform()
+    # wait for element to appear, then hover it
+    time.sleep(1)
+    men_menu = wait.until(ec.visibility_of_element_located((By.XPATH, '//*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[80]')))
+    ActionChains(browser).move_to_element(men_menu).perform()
+    time.sleep(1)
+    men_menu = wait.until(ec.visibility_of_element_located((By.XPATH, '//*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[100]')))
+    ActionChains(browser).move_to_element(men_menu).perform()
+    time.sleep(1)
+    # wait for Fastrack menu item to appear, then click it
+    # fastrack = WebDriverWait(browser, 10).until(ec.visibility_of_element_located((By.XPATH, "//a[@data-tracking-id='0_Fastrack']")))
+
+
+    
+    # wait = browser(driver, 10)
+
+    # element = wait.until(ec.visibility_of_element_located((By.XPATH, '//*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[100]')))
+
+
+    innerHTML = browser.execute_script("return document.body.innerHTML")
+
+    return innerHTML
+
+
+def scrape(r):
+
+    
+    # r = requests.get('https://coinmarketcap.com/')
     # print(r.content)
-    soup = BeautifulSoup(r.content, "lxml")
+
+    
+    # soup = BeautifulSoup(r.content, "lxml")
+    soup = BeautifulSoup(r,features="lxml")
     
     alldata = []
     coins = soup.find_all('tr')
@@ -100,12 +155,13 @@ def scrape():
         newdata = []
         newdata.append(temp[1])
         newdata.append(temp[3])
+        newdata.append(temp[4])
+        newdata.append(temp[5])
+        newdata.append(temp[6])
         alldata.append(newdata)
         print()
-        if coin==25:
-            break
 
-
+    
     return alldata
             
 
@@ -116,7 +172,7 @@ def scrape():
 #Writing to CSV file from the data gathered
 def write_to_csv(file):
 
-    fields = ['Name', 'Symbol', 'Percent Change', 'Percent Change 7 days', 'Market Cap', 'Volume 24 Hr', 'Circulating Supply', 'Pull Time']
+    fields = ['Name', 'Symbol', 'Price', 'Percent Change', 'Percent Change 7 days', 'Market Cap', 'Volume 24 Hr', 'Circulating Supply', 'Pull Time']
     filename = 'coinmarketcap.csv'
 
     #removes the pull time since csv doesn't need that.
@@ -143,7 +199,7 @@ def connect_db(alldata):
 
         #Create table query and execute
         c.execute('''CREATE TABLE  IF NOT EXISTS MARKETDATA
-                (PULLTIME DATETIME, Name TEXT, PER_CHANGE_H TEXT, PER_CHANGE_D TEXT, 
+                (PULLTIME DATETIME, Name TEXT, Price TEXT, PER_CHANGE_H TEXT, PER_CHANGE_D TEXT, 
                 MARKET_CAP TEXT, VOL_H TEXT, CIRCULATING_SUPPLY TEXT, FOREIGN KEY (Name) REFERENCES CRYPTOCURRENCIES(Name) ) ''')
 
         #Crypto Name and Symbol list
@@ -193,11 +249,12 @@ def connect_db(alldata):
 
 
 #Call the 3 functions
-# file = initialize()
-# write_to_csv(file)
-# connect_db(file)
+file = initialize()
+write_to_csv(file)
+connect_db(file)
 
-
-print(scrape())
+# page_data = start_chrome()
+# print(scrape(page_data))
+# print(scrape())
 
 
