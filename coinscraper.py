@@ -95,41 +95,32 @@ def start_chrome():
     # browser = webdriver.Chrome()
     url = "https://coinmarketcap.com/"
     browser.get(url) #navigate to the page
-    # time.sleep(1)
-    # browser.execute_script("window.scrollBy(25,document.body.scrollHeight)")
-    # # browser.execute_script("window.scrollTo(0,document.body.scrollHeight)")
-    # time.sleep(1)
-    # browser.execute_script("window.scrollBy(25,document.body.scrollHeight)")
-    # 
-    # browser.execute_script("window.scrollBy(0,document.body.scrollHeight)")
+    
+
     browser.maximize_window()
-    # time.sleep(1)
+    
     wait = WebDriverWait(browser, 10)
-    men_menu = wait.until(ec.visibility_of_element_located((By.XPATH, '//*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[20]')))
-                                          #  //*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[52]
-    ActionChains(browser).move_to_element(men_menu).perform()
-    time.sleep(1)
-    men_menu = wait.until(ec.visibility_of_element_located((By.XPATH, '//*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[40]')))
-    ActionChains(browser).move_to_element(men_menu).perform()
-    time.sleep(1)
-    men_menu = wait.until(ec.visibility_of_element_located((By.XPATH, '//*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[60]')))
+    men_menu = wait.until(ec.visibility_of_element_located((By.XPATH, '//*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[20]')))                                      
     ActionChains(browser).move_to_element(men_menu).perform()
     # wait for element to appear, then hover it
     time.sleep(1)
+
+    men_menu = wait.until(ec.visibility_of_element_located((By.XPATH, '//*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[40]')))
+    ActionChains(browser).move_to_element(men_menu).perform()
+    time.sleep(1)
+
+    men_menu = wait.until(ec.visibility_of_element_located((By.XPATH, '//*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[60]')))
+    ActionChains(browser).move_to_element(men_menu).perform()
+    time.sleep(1)
+
     men_menu = wait.until(ec.visibility_of_element_located((By.XPATH, '//*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[80]')))
     ActionChains(browser).move_to_element(men_menu).perform()
     time.sleep(1)
+
     men_menu = wait.until(ec.visibility_of_element_located((By.XPATH, '//*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[100]')))
     ActionChains(browser).move_to_element(men_menu).perform()
     time.sleep(1)
-    # wait for Fastrack menu item to appear, then click it
-    # fastrack = WebDriverWait(browser, 10).until(ec.visibility_of_element_located((By.XPATH, "//a[@data-tracking-id='0_Fastrack']")))
-
-
     
-    # wait = browser(driver, 10)
-
-    # element = wait.until(ec.visibility_of_element_located((By.XPATH, '//*[@id="__next"]/div/div[1]/div[2]/div/div/div[2]/table/tbody/tr[100]')))
 
 
     innerHTML = browser.execute_script("return document.body.innerHTML")
@@ -155,6 +146,8 @@ def scrape(r):
         newdata = []
         newdata.append(temp[1])
         newdata.append(temp[3])
+        # if temp[4]=='Buy':
+
         newdata.append(temp[4])
         newdata.append(temp[5])
         newdata.append(temp[6])
@@ -217,21 +210,22 @@ def connect_db(alldata):
         #Add data for each row to append to a tuple
         for i in alldata:
             market = []
-            market.append(i[len(i)-1])
+            market.append(i[8])
             market.append(i[0])
             market.append(i[2])
             market.append(i[3])
             market.append(i[4])
             market.append(i[5])
             market.append(i[6])
+            market.append(i[7])
             #append tuple to list
             marketdata.append(tuple(market))
 
         # print(marketdata)
 
         #Insert Data into Market Data table
-        market_insert_query = """INSERT INTO MARKETDATA (PULLTIME , Name , PER_CHANGE_H , PER_CHANGE_D , 
-                MARKET_CAP , VOL_H , CIRCULATING_SUPPLY ) VALUES (?, ?,?,?,?,?,?) """
+        market_insert_query = """INSERT INTO MARKETDATA (PULLTIME , Name , Price, PER_CHANGE_H , PER_CHANGE_D , 
+                MARKET_CAP , VOL_H , CIRCULATING_SUPPLY ) VALUES (?, ?,?,?,?,?,?,?) """
         c.executemany(market_insert_query, marketdata)
         conn.commit()
 
@@ -249,12 +243,12 @@ def connect_db(alldata):
 
 
 #Call the 3 functions
-file = initialize()
-write_to_csv(file)
-connect_db(file)
+# file = initialize()
+# write_to_csv(file)
+# connect_db(file)
 
-# page_data = start_chrome()
-# print(scrape(page_data))
+page_data = start_chrome()
+print(scrape(page_data))
 # print(scrape())
 
 
