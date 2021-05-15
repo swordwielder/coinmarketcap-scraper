@@ -79,9 +79,10 @@ def scrape(r):
         temp = coins[coin].findAll(text=True)  #Only gets the text
         
         newdata = []
+        
+        #Removes the extra spaces and 'Buy' from the list
         while ' ' in temp: 
             temp.remove(' ')
-        
         if 'Buy' in temp:
             temp.remove('Buy')
 
