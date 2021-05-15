@@ -113,20 +113,17 @@ def scrape(r):
             
 
 
-
 #Writing to CSV file from the data gathered
 def write_to_csv(file):
 
     fields = ['Name', 'Symbol', 'Price', 'Percent Change', 'Percent Change 7 days', 'Market Cap', 'Volume 24 Hr', 'Circulating Supply', 'Pull Time']
     filename = 'coinmarketcap.csv'
 
-
     #Writes the info pulled into the CSV
     with open(filename, 'w') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(fields)
         csvwriter.writerows(file)
-
 
 
 #Creates the db, create table and insert.
@@ -199,10 +196,7 @@ connect_db(coindatalist)
 
 
 
-
-
 #Call the functions for API scrape, comment out the 3 lines below to use the API method
-
 # file = initialize()
 # write_to_csv(file)
 # connect_db(file)
