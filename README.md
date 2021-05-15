@@ -60,7 +60,7 @@ This is a Coin Market Cap Scraper that scrapes the top 100 coins on coinmarketca
 * [coin market cap api](https://coinmarketcap.com/api/) (300 per day, 10,000 per month)
 
 
-## Library/pACKAGE:
+## Library/Package:
 
 * Python
 
