@@ -77,29 +77,35 @@ def scrape(r):
     coins = soup.find_all('tr')
     for coin in range(1,len(coins)):
         temp = coins[coin].findAll(text=True)  #Only gets the text
-        print(temp)
+        
         newdata = []
+        while ' ' in temp: 
+            temp.remove(' ')
+        
+        if 'Buy' in temp:
+            temp.remove('Buy')
+        print(temp)
         #Add each individual info of the scraped data
         newdata.append(temp[1])
         newdata.append(temp[3])
-        if len(temp)==16:
-            newdata.append(temp[5])
-            newdata.append(temp[6]+temp[8])
-            newdata.append(temp[9]+temp[11])
-            newdata.append(temp[12])
-            newdata.append(temp[13])
-        if len(temp)==15:
-            newdata.append(temp[4])
-            newdata.append(temp[5]+temp[7])
-            newdata.append(temp[8]+temp[10])
-            newdata.append(temp[11])
-            newdata.append(temp[12])
-        if len(temp)==12:
-            newdata.append(temp[5])
-            newdata.append(temp[6])
-            newdata.append(temp[7])
-            newdata.append(temp[8])
-            newdata.append(temp[9])
+        # if len(temp)==16:
+        #     newdata.append(temp[5])
+        #     newdata.append(temp[6]+temp[8])
+        #     newdata.append(temp[9]+temp[11])
+        #     newdata.append(temp[12])
+        #     newdata.append(temp[13])
+        # if len(temp)==15:
+        #     newdata.append(temp[4])
+        #     newdata.append(temp[5]+temp[7])
+        #     newdata.append(temp[8]+temp[10])
+        #     newdata.append(temp[11])
+        #     newdata.append(temp[12])
+        # if len(temp)==12:
+        #     newdata.append(temp[5])
+        #     newdata.append(temp[6])
+        #     newdata.append(temp[7])
+        #     newdata.append(temp[8])
+        #     newdata.append(temp[9])
         if len(temp)==11:
             newdata.append(temp[4])
             newdata.append(temp[5])
