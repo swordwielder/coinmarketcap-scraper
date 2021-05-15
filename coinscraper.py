@@ -27,69 +27,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
-#API call method
-#initialize function
-def initialize():
-
-    alldata = []
-    #gets API key from environment variable
-    API_KEY = config('API_KEY')
-
-    # sets url and parameters and takes API key for header
-    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
-    parameters = {
-    'start':'1',
-    'limit':'100',
-    'convert':'USD'
-    }
-    headers = {
-    'Accepts': 'application/json',
-    'X-CMC_PRO_API_KEY': API_KEY,
-    }
-
-    #initialize a session and update header for session
-    session = Session()
-    session.headers.update(headers)
-
-    try:
-        #get response from the url
-        response = session.get(url, params=parameters)
-        #loads it in json for all the text found from response
-        data = json.loads(response.text)
-        #set all coins to the data 
-        coins = data['data']
-        #for each coin in all the coins found
-        for coin in coins:
-            # print(coin)
-            #append each coin data to a list
-            newdata=[]
-            newdata.append(coin['name'])
-            newdata.append(coin['symbol'])
-            newdata.append(coin['quote']['USD']['price'])
-            newdata.append(str(coin['quote']['USD']['percent_change_24h']))
-            newdata.append(coin['quote']['USD']['percent_change_7d'])
-            newdata.append(coin['quote']['USD']['market_cap'])
-            newdata.append(coin['quote']['USD']['volume_24h'])
-            newdata.append(coin['circulating_supply'])
-
-            # datetime object containing current date and time
-            now = datetime.now()
-            dt_string = now.strftime("%Y-%m-%d %H:%M:%S")
-            newdata.append(dt_string)
-
-            #append the single coin
-            alldata.append(newdata)
-    except (ConnectionError, Timeout, TooManyRedirects) as e:
-        print(e)
-
-    return alldata
+from apicall import initialize   
 
 
 
 
 
 #BeautifulSoup Scraping method
-
 def start_chrome():
     browser = webdriver.Chrome(ChromeDriverManager().install())
     # browser = webdriver.Chrome()
@@ -125,51 +69,51 @@ def start_chrome():
 
 
 def scrape(r):
-
-    
-    # r = requests.get('https://coinmarketcap.com/')
-    # print(r.content)
-
     
     # soup = BeautifulSoup(r.content, "lxml")
     soup = BeautifulSoup(r,features="lxml")
-    
     alldata = []
+    #Finds all the table row on the page
     coins = soup.find_all('tr')
     for coin in range(1,len(coins)):
-        temp = coins[coin].findAll(text=True)
-        # print('THIS IS THE TEMP')
+        temp = coins[coin].findAll(text=True)  #Only gets the text
         print(temp)
         newdata = []
+        #Add each individual info of the scraped data
+        newdata.append(temp[1])
+        newdata.append(temp[3])
         if len(temp)==16:
-            newdata.append(temp[1])
-            newdata.append(temp[3])
-            newdata.append(temp[4])
+            newdata.append(temp[5])
             newdata.append(temp[6]+temp[8])
             newdata.append(temp[9]+temp[11])
             newdata.append(temp[12])
             newdata.append(temp[13])
-            a = temp[15].split()
-            newdata.append(a[0])
+        if len(temp)==15:
+            newdata.append(temp[4])
+            newdata.append(temp[5]+temp[7])
+            newdata.append(temp[8]+temp[10])
+            newdata.append(temp[11])
+            newdata.append(temp[12])
+        if len(temp)==12:
+            newdata.append(temp[5])
+            newdata.append(temp[6])
+            newdata.append(temp[7])
+            newdata.append(temp[8])
+            newdata.append(temp[9])
         if len(temp)==11:
-            newdata.append(temp[1])
-            newdata.append(temp[3])
             newdata.append(temp[4])
             newdata.append(temp[5])
             newdata.append(temp[6])
             newdata.append(temp[7])
             newdata.append(temp[8])
-            a=temp[10].split()
-            newdata.append(a[0])
-
-
+        
+        a=temp[len(temp)-1].split()
+        newdata.append(a[0])
+        #Gets the current time and then append that to the list
         now = datetime.now()
         dt_string = now.strftime("%Y-%m-%d %H:%M:%S")
         newdata.append(dt_string)
         alldata.append(newdata)
-        # print()
-        # print("ALL THE DATA")
-        # print(alldata)
         
     return alldata
             
@@ -247,24 +191,26 @@ def connect_db(alldata):
         c.execute("SELECT * FROM MARKETDATA")
         row = c.fetchall()
         # print(row)
+        conn.close()
+        
         
     except Error as e:
         print(e)
     
 
-    
 
-
-#Call the 3 functions
-# file = initialize()
-# print('THIS IS THE API call data')
-# print(file)
-# write_to_csv(file)
-# connect_db(file)
-# print()
+#Call the Web scraper method then write to csv and connect and write to database
 page_data = start_chrome()
 coindatalist = scrape(page_data)
-
-
 write_to_csv(coindatalist)
 connect_db(coindatalist)
+
+
+
+
+
+#Call the functions for API scrape
+
+# file = initialize()
+# write_to_csv(file)
+# connect_db(file)
