@@ -209,7 +209,7 @@ connect_db(coindatalist)
 
 
 
-#Call the functions for API scrape
+#Call the functions for API scrape, comment out the 3 lines below to use the API method
 
 # file = initialize()
 # write_to_csv(file)
