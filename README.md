@@ -37,7 +37,7 @@ This is a Coin Market Cap Scraper that scrapes the top 100 coins on coinmarketca
 #### Optional
 * Request for a API Key from [here](https://coinmarketcap.com/api/) and put the key in a `.env` file with the name API_KEY='YOUR_API_KEY_HERE' (ex: API_KEY=fuywge83hf7832j) in the same directory (Will run faster if choose to use API)
 
-* [SQLite Studio](https://sqlitestudio.pl/) **optional** can be used to view the data from the database (crypto.db)
+* [SQLite Studio](https://sqlitestudio.pl/) (**optional**) can be used to view the data from the database (crypto.db)
 
 
 ## To run:
